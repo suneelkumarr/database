@@ -86,6 +86,7 @@ exports.login = async (req, res) => {
       .status(200)
       .json({
         success: true,
+        user,
         authorization: req.authToken,
       });
 
