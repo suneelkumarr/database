@@ -2,6 +2,7 @@
 const makeValidation = require('@withvoid/make-validation');
 // models
 const UserModel = require('../model/userModel');
+const bcrypt = require("bcryptjs");
 
 exports.onGetAllUsers = async(req, res) =>{
     try {
@@ -30,19 +31,50 @@ exports.onCreateUser = async (req, res) => {
           checks: {
             firstName: { type: types.string },
             lastName: { type: types.string },
-            email: {type: types.string}
+            email: {type: types.string},
+            password: { type: types.string}
           }
         }));
         if (!validation.success) return res.status(400).json({ ...validation });
   
-        const { firstName, lastName , email } = req.body;
-        const user = await UserModel.createUser(firstName, lastName, email);
+        const { firstName, lastName , email, password } = req.body;
+        const user = await UserModel.createUser(firstName, lastName, email, password);
+            // generate salt to hash password
+        const salt = await bcrypt.genSalt(10);
+         // now we set user password to hashed password
+        user.password = await bcrypt.hash(user.password, salt);
+        await user.save();
         return res.status(200).json({ success: true, user });
       } catch (error) {
+        console.log(error);
         return res.status(500).json({ success: false, error: error })
       }
 }
 
+exports.login = async (req, res) => {
+  try{
+      // Validate if user exist in our database
+      const user = await UserModel.findOne({ email: req.body.email });
+      // Validate user input
+       if (!user) {
+          return res.status(401).json({ err: "email not match" });
+       }
+      auth = await bcrypt.compare(req.body.password,user.password);
+      if (!auth) {
+              return res.status(401).json({ err: "password not match" });
+            }
+    await user.save();
+    return res
+      .status(200)
+      .json({
+        success: true,
+        authorization: req.authToken,
+      });
+
+  }catch (error) {
+    return res.status(500).json({ success: false, error: error })
+  }
+}
 
 exports.onDeleteUserById = async(req, res) => {
     try {

@@ -43,6 +43,10 @@ const userSchema = new  Schema (
           message: "Please enter a valid email",
         },
     },
+    password:{ 
+      type:String,
+      required: "Please enter a valid password"
+  },
     token: { type:String}
     // type: String,
   },
@@ -57,9 +61,9 @@ const userSchema = new  Schema (
  * @param {String} lastName
  * @returns {Object} new user object created
  */
-userSchema.statics.createUser = async function (firstName, lastName, email) {
+userSchema.statics.createUser = async function (firstName, lastName, email , password) {
   try {
-    const user = await this.create({ firstName, lastName, email });
+    const user = await this.create({ firstName, lastName, email ,password});
     return user;
   } catch (error) {
     throw error;

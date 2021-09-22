@@ -3,16 +3,12 @@ const router = express.Router()
 
 const {encode} = require('../middleware/jwt')
 
+const userController = require('../controller/userController')
+
 
 
 router
-  .post('/login/:userId', encode, (req, res, next) => {
-    return res
-      .status(200)
-      .json({
-        success: true,
-        authorization: req.authToken,
-      });
-  });
+  .post('/login/:userId', encode, userController.login);
+
 
   module.exports =router;
