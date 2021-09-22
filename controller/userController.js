@@ -1,8 +1,10 @@
+require('dotenv').config()
 // utils
 const makeValidation = require('@withvoid/make-validation');
 // models
 const UserModel = require('../model/userModel');
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 exports.onGetAllUsers = async(req, res) =>{
     try {
@@ -53,6 +55,9 @@ exports.onCreateUser = async (req, res) => {
 
 exports.login = async (req, res) => {
   try{
+
+        // const { userId } = req.params;
+        //  const userid = await UserModel.getUserById(userId);
       // Validate if user exist in our database
       const user = await UserModel.findOne({ email: req.body.email });
       // Validate user input
@@ -63,6 +68,19 @@ exports.login = async (req, res) => {
       if (!auth) {
               return res.status(401).json({ err: "password not match" });
             }
+
+    const payload = {
+              userId: user._id,
+    };
+      const token = jwt.sign(
+      { payload },
+              process.env.SECRET_KEY,
+              {
+                expiresIn: "2h",
+              }
+            );
+      // save user token
+    user.token = token; 
     await user.save();
     return res
       .status(200)
@@ -72,6 +90,7 @@ exports.login = async (req, res) => {
       });
 
   }catch (error) {
+    console.log(error);
     return res.status(500).json({ success: false, error: error })
   }
 }
