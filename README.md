@@ -5,3 +5,5 @@
 ![screenshot](screenshot/userlogin.png)
 ![screenshot](screenshot/createmessage.png)
 ![screenshot](screenshot/readmessage.png)
+![screenshot](screenshot/usercreatewithpass.png)
+![screenshot](screenshot/userloginwithemailpass.png)
